@@ -4,6 +4,7 @@ import { useAccount } from 'wagmi';
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
+  // Wallet connection page
   const [mounted, setMounted] = useState(false);
   const { open } = useWeb3Modal();
   const { address, isConnected } = useAccount();
