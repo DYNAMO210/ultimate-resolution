@@ -1,39 +1,23 @@
 import { useEffect, useState } from "react";
-import bitcoinLogo from "@/assets/bitcoin.png";
-import ethereumLogo from "@/assets/ethereum.png";
-import bnbLogo from "@/assets/bnb.png";
-import xrpLogo from "@/assets/xrp.png";
-import cardanoLogo from "@/assets/cardano.png";
-import solanaLogo from "@/assets/solana.png";
-import dogecoinLogo from "@/assets/dogecoin.png";
-import polkadotLogo from "@/assets/polkadot.png";
-import avalancheLogo from "@/assets/avalanche.png";
-
-const cryptoLogos = [
-  { src: bitcoinLogo, alt: "Bitcoin", delay: 0 },
-  { src: ethereumLogo, alt: "Ethereum", delay: 2 },
-  { src: bnbLogo, alt: "BNB", delay: 4 },
-  { src: xrpLogo, alt: "XRP", delay: 6 },
-  { src: cardanoLogo, alt: "Cardano", delay: 8 },
-  { src: solanaLogo, alt: "Solana", delay: 10 },
-  { src: dogecoinLogo, alt: "Dogecoin", delay: 12 },
-  { src: polkadotLogo, alt: "Polkadot", delay: 14 },
-  { src: avalancheLogo, alt: "Avalanche", delay: 16 },
-];
+import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useAccount } from 'wagmi';
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [mounted, setMounted] = useState(false);
+  const { open } = useWeb3Modal();
+  const { address, isConnected } = useAccount();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-gradient-to-br from-[hsl(220,80%,6%)] via-[hsl(270,60%,10%)] to-[hsl(180,60%,15%)]">
+    <main className="relative min-h-screen overflow-hidden bg-black">
       {/* Title Section */}
-      <div className="relative z-10 flex items-center justify-center min-h-screen">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen gap-12">
         <h1 
-          className={`font-orbitron text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-center px-4 transition-all duration-1000 ${
+          className={`font-cormorant text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light text-center px-4 transition-all duration-1000 tracking-wide ${
             mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-10'
           }`}
           style={{
@@ -52,42 +36,23 @@ const Index = () => {
           <br />
           RESOLUTION
         </h1>
-      </div>
 
-      {/* 3D Flowing Crypto Logos */}
-      <div 
-        className="absolute inset-0 flex items-center overflow-hidden pointer-events-none"
-        style={{ perspective: '1000px' }}
-      >
-        {/* Multiple rows for continuous flow effect */}
-        {[0, 1, 2].map((rowIndex) => (
-          <div
-            key={rowIndex}
-            className="absolute w-full"
-            style={{
-              top: `${30 + rowIndex * 20}%`,
-            }}
+        <div className={`transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <Button
+            onClick={() => open()}
+            size="lg"
+            className="font-cormorant text-lg px-8 py-6 bg-primary/10 border-2 border-primary hover:bg-primary/20 text-primary backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,255,255,0.5)]"
           >
-            {cryptoLogos.map((logo, index) => (
-              <img
-                key={`${rowIndex}-${index}`}
-                src={logo.src}
-                alt={logo.alt}
-                className="absolute w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-contain opacity-80 hover:opacity-100 transition-opacity"
-                style={{
-                  animation: `flow-3d ${20 + rowIndex * 2}s linear infinite`,
-                  animationDelay: `${logo.delay + rowIndex * 1.5}s`,
-                  filter: 'drop-shadow(0 0 10px rgba(0, 255, 255, 0.5))',
-                }}
-                loading="eager"
-              />
-            ))}
-          </div>
-        ))}
+            {isConnected && address 
+              ? `${address.slice(0, 6)}...${address.slice(-4)}`
+              : 'Connect Wallet'
+            }
+          </Button>
+        </div>
       </div>
 
       {/* Ambient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[hsl(220,80%,6%)] via-transparent to-[hsl(220,80%,6%)] opacity-60 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black opacity-60 pointer-events-none" />
     </main>
   );
 };

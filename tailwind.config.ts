@@ -113,6 +113,7 @@ export default {
       },
       fontFamily: {
         orbitron: ["Orbitron", "sans-serif"],
+        cormorant: ["Cormorant Garamond", "serif"],
       },
     },
   },
