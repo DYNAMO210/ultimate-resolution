@@ -80,10 +80,39 @@ export default {
             height: "0",
           },
         },
+        "flow-3d": {
+          "0%": {
+            transform: "translateX(-100%) translateZ(0) rotateY(-15deg)",
+            opacity: "0",
+          },
+          "10%": {
+            opacity: "1",
+          },
+          "90%": {
+            opacity: "1",
+          },
+          "100%": {
+            transform: "translateX(100vw) translateZ(0) rotateY(15deg)",
+            opacity: "0",
+          },
+        },
+        "glow-pulse": {
+          "0%, 100%": {
+            textShadow: "0 0 20px hsl(180, 100%, 50%), 0 0 40px hsl(180, 100%, 50%)",
+          },
+          "50%": {
+            textShadow: "0 0 30px hsl(180, 100%, 50%), 0 0 60px hsl(180, 100%, 50%), 0 0 80px hsl(270, 80%, 60%)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "flow-3d": "flow-3d 20s linear infinite",
+        "glow-pulse": "glow-pulse 3s ease-in-out infinite",
+      },
+      fontFamily: {
+        orbitron: ["Orbitron", "sans-serif"],
       },
     },
   },
