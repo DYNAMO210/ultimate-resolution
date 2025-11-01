@@ -15,6 +15,9 @@ const Index = () => {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-black">
+      {/* Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-cyan-900/20" />
+      
       {/* Title Section */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen gap-12">
         <h1 
@@ -39,16 +42,20 @@ const Index = () => {
         </h1>
 
         <div className={`transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <Button
-            onClick={() => open()}
-            size="lg"
-            className="font-cormorant text-lg px-8 py-6 bg-primary/10 border-2 border-primary hover:bg-primary/20 text-primary backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,255,255,0.5)]"
+          <button 
+            onClick={() => (window as any).connectWallet?.()} 
+            style={{ 
+              background: 'gold', 
+              color: 'black', 
+              padding: '15px 30px', 
+              fontSize: '18px', 
+              border: 'none', 
+              borderRadius: '10px',
+              cursor: 'pointer'
+            }}
           >
-            {isConnected && address 
-              ? `${address.slice(0, 6)}...${address.slice(-4)}`
-              : 'Connect Wallet'
-            }
-          </Button>
+            Connect Wallet
+          </button>
         </div>
       </div>
 
