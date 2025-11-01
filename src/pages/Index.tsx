@@ -43,7 +43,13 @@ const Index = () => {
 
         <div className={`transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <button 
-            onClick={() => (window as any).connectWallet?.()} 
+            onClick={() => {
+              if (typeof (window as any).connectWallet === 'function') {
+                (window as any).connectWallet();
+              } else {
+                console.error('connectWallet function not found on window');
+              }
+            }}
             style={{ 
               background: 'gold', 
               color: 'black', 
@@ -51,7 +57,8 @@ const Index = () => {
               fontSize: '18px', 
               border: 'none', 
               borderRadius: '10px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontWeight: '600'
             }}
           >
             Connect Wallet
