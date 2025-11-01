@@ -9,13 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
 
-      - name: Debug - Show Secrets (Masked)
+      - name: Debug - Show Secrets
         run: |
           echo "MAINNET_PK is set: ${{ secrets.MAINNET_PK != '' && 'YES' || 'NO' }}"
           echo "ALCHEMY_KEY is set: ${{ secrets.ALCHEMY_KEY != '' && 'YES' || 'NO' }}"
