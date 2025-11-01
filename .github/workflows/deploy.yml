@@ -35,11 +35,11 @@ jobs:
           echo "=== DEPLOY LOG ==="
           cat deploy.log
 
-          # Extract contractAddress from receipt
-          ADDRESS=$(jq -r '.receipts[0].contractAddress // empty' deploy.log)
+          # Extract deployedTo
+          ADDRESS=$(jq -r '.deployedTo // empty' deploy.log)
 
           if [ -z "$ADDRESS" ] || [ "$ADDRESS" = "null" ]; then
-            echo "ERROR: No contractAddress in receipt!"
+            echo "ERROR: No deployedTo in JSON!"
             cat deploy.log
             exit 1
           fi
