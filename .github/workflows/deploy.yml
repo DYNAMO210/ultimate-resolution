@@ -15,9 +15,6 @@ jobs:
         with:
           version: nightly
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
       - name: Compile & Deploy
         env:
           PRIVATE_KEY: ${{ secrets.MAINNET_PK }}
@@ -30,17 +27,35 @@ jobs:
             --legacy \
             --json > deploy.log || (cat deploy.log && exit 1)
 
-      - name: Extract Address
+      - name: Extract Tx Hash & Get Contract Address
+        env:
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
         run: |
           echo "=== DEPLOY LOG ==="
           cat deploy.log
-          ADDRESS=$(jq -r '.contractAddress // empty' deploy.log)
-          if [ -z "$ADDRESS" ] || [ "$ADDRESS" = "null" ]; then
-            echo "ERROR: No contractAddress in JSON!"
+
+          # Extract transaction hash
+          TX_HASH=$(jq -r '.transaction.hash // empty' deploy.log)
+          if [ -z "$TX_HASH" ]; then
+            echo "ERROR: No transaction hash found!"
             exit 1
           fi
+          echo "Transaction Hash: $TX_HASH"
+
+          # Query Etherscan
+          echo "Fetching contract address from Etherscan..."
+          RESPONSE=$(curl -s "https://api.etherscan.io/api?module=contract&action=getcontractcreation&contractaddresses=&txhash=$TX_HASH&apikey=$ETHERSCAN_API_KEY")
+          ADDRESS=$(echo "$RESPONSE" | jq -r '.result[0].contractAddress // empty')
+
+          if [ -z "$ADDRESS" ] || [ "$ADDRESS" = "null" ]; then
+            echo "ERROR: Could not get contract address from Etherscan!"
+            echo "Response: $RESPONSE"
+            exit 1
+          fi
+
           echo "CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
           echo "Deployed to: $ADDRESS"
+          echo "Etherscan: https://etherscan.io/address/$ADDRESS"
 
       - name: Update resolution.js
         run: |
