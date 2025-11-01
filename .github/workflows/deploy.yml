@@ -9,14 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-
-      - name: Force Clone OpenZeppelin
-        run: |
-          git submodule update --init --recursive
-          echo "OpenZeppelin files:"
-          ls -la lib/openzeppelin-contracts/contracts/token/ERC20/ || echo "Clone failed"
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -32,9 +24,7 @@ jobs:
           forge create ultimateresolution.sol:UltimateResolution \
             --private-key "$PRIVATE_KEY" \
             --rpc-url "$RPC_URL" \
-            --legacy \
-            --remappings @openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/ \
-            > deploy.log || (cat deploy.log && exit 1)
+            --legacy > deploy.log || (cat deploy.log && exit 1)
 
       - name: Extract Contract Address
         run: |
@@ -45,6 +35,7 @@ jobs:
             exit 1
           fi
           echo "CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
+          echo "Deployed to: $ADDRESS"
 
       - name: Update resolution.js
         run: |
