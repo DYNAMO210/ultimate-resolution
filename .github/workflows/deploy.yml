@@ -15,20 +15,32 @@ jobs:
         with:
           version: nightly
 
+      - name: Debug - Show Secrets (Masked)
+        run: |
+          echo "MAINNET_PK is set: ${{ secrets.MAINNET_PK != '' && 'YES' || 'NO' }}"
+          echo "ALCHEMY_KEY is set: ${{ secrets.ALCHEMY_KEY != '' && 'YES' || 'NO' }}"
+
       - name: Compile & Deploy
         env:
           PRIVATE_KEY: ${{ secrets.MAINNET_PK }}
           RPC_URL: https://eth-mainnet.g.alchemy.com/v2/${{ secrets.ALCHEMY_KEY }}
         run: |
+          echo "Deploying with PRIVATE_KEY (masked): ${PRIVATE_KEY:0:6}...${PRIVATE_KEY: -4}"
           forge create ultimateresolution.sol:UltimateResolution \
-            --private-key $PRIVATE_KEY \
-            --rpc-url $RPC_URL \
-            --legacy > deploy.log
+            --private-key "$PRIVATE_KEY" \
+            --rpc-url "$RPC_URL" \
+            --legacy > deploy.log || (cat deploy.log && exit 1)
 
       - name: Extract Contract Address
         run: |
+          cat deploy.log
           ADDRESS=$(grep -o "0x[0-9a-fA-F]\{40\}" deploy.log | tail -1)
+          if [ -z "$ADDRESS" ]; then
+            echo "ERROR: No contract address found!"
+            exit 1
+          fi
           echo "CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
+          echo "Deployed to: $ADDRESS"
 
       - name: Update resolution.js
         run: |
