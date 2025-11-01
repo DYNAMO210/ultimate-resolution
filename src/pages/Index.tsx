@@ -42,27 +42,13 @@ const Index = () => {
         </h1>
 
         <div className={`transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <button 
-            onClick={() => {
-              if (typeof (window as any).connectWallet === 'function') {
-                (window as any).connectWallet();
-              } else {
-                console.error('connectWallet function not found on window');
-              }
-            }}
-            style={{ 
-              background: 'gold', 
-              color: 'black', 
-              padding: '15px 30px', 
-              fontSize: '18px', 
-              border: 'none', 
-              borderRadius: '10px',
-              cursor: 'pointer',
-              fontWeight: '600'
-            }}
+          <Button 
+            onClick={() => open()}
+            size="lg"
+            className="bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-600 hover:to-purple-600 text-white font-semibold px-8 py-6 text-lg"
           >
             Connect Wallet
-          </button>
+          </Button>
         </div>
       </div>
 
