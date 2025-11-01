@@ -15,6 +15,9 @@ jobs:
         with:
           version: nightly
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Compile & Deploy
         env:
           PRIVATE_KEY: ${{ secrets.MAINNET_PK }}
@@ -24,21 +27,18 @@ jobs:
           forge create ultimateresolution.sol:UltimateResolution \
             --private-key "$PRIVATE_KEY" \
             --rpc-url "$RPC_URL" \
-            --legacy > deploy.log || (cat deploy.log && exit 1)
+            --legacy \
+            --json > deploy.log || (cat deploy.log && exit 1)
 
       - name: Extract Address
         run: |
+          echo "=== DEPLOY LOG ==="
           cat deploy.log
-          echo "=== FULL LOG ABOVE ==="
-
-          # Try to get from JSON
-          ADDRESS=$(cat deploy.log | grep -o '"contractAddress":"0x[0-9a-fA-F]\{40\}"' | cut -d'"' -f4 | head -1)
-
-          if [ -z "$ADDRESS" ]; then
-            echo "ERROR: No contractAddress found in JSON!"
+          ADDRESS=$(jq -r '.contractAddress // empty' deploy.log)
+          if [ -z "$ADDRESS" ] || [ "$ADDRESS" = "null" ]; then
+            echo "ERROR: No contractAddress in JSON!"
             exit 1
           fi
-
           echo "CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
           echo "Deployed to: $ADDRESS"
 
