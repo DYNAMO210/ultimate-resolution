@@ -22,7 +22,6 @@ jobs:
         run: |
           echo "Deploying with PRIVATE_KEY (masked): ${PRIVATE_KEY:0:6}...${PRIVATE_KEY: -4}"
           
-          # Deploy and get receipt
           forge create ultimateresolution.sol:UltimateResolution \
             --private-key "$PRIVATE_KEY" \
             --rpc-url "$RPC_URL" \
@@ -30,29 +29,32 @@ jobs:
             --broadcast \
             --json > deploy.log || (cat deploy.log && exit 1)
 
-      - name: Extract Contract Address from Receipt
+      - name: Extract Contract Address
         run: |
           echo "=== DEPLOY LOG ==="
           cat deploy.log
-
-          # Extract deployedTo
           ADDRESS=$(jq -r '.deployedTo // empty' deploy.log)
-
           if [ -z "$ADDRESS" ] || [ "$ADDRESS" = "null" ]; then
             echo "ERROR: No deployedTo in JSON!"
-            cat deploy.log
             exit 1
           fi
-
           echo "CONTRACT_ADDRESS=$ADDRESS" >> $GITHUB_ENV
           echo "Deployed to: $ADDRESS"
-          echo "Etherscan: https://etherscan.io/address/$ADDRESS"
 
-      - name: Update resolution.js
+      - name: Update resolution.js (Only if Needed)
         run: |
+          # Check if address already in file
+          if grep -q "$CONTRACT_ADDRESS" public/resolution.js; then
+            echo "Address already in resolution.js — skipping update"
+            exit 0
+          fi
+
+          # Replace placeholder
           sed -i "s/0xWillBeAutoFilled/$CONTRACT_ADDRESS/g" public/resolution.js
+          
+          # Commit only if changed
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add public/resolution.js
-          git commit -m "Update contract address: $CONTRACT_ADDRESS"
-          git push
+          git commit -m "Update contract address: $CONTRACT_ADDRESS" || echo "No changes to commit"
+          git push || echo "Nothing to push"
