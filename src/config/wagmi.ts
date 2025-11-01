@@ -3,7 +3,7 @@ import { http, createConfig } from 'wagmi';
 import { mainnet, polygon, arbitrum, optimism, base } from 'wagmi/chains';
 import { walletConnect, injected, coinbaseWallet } from 'wagmi/connectors';
 
-const projectId = 'YOUR_PROJECT_ID'; // Users should get this from WalletConnect Cloud
+const projectId = '281727c769bcec075b63e0fbc5a3fdcc';
 
 const metadata = {
   name: 'Ultimate Blockchain Resolution',
