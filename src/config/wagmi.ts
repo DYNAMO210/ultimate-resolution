@@ -24,7 +24,15 @@ export const config = createConfig({
     [base.id]: http(),
   },
   connectors: [
-    walletConnect({ projectId, metadata, showQrModal: false }),
+    walletConnect({ 
+      projectId, 
+      metadata, 
+      showQrModal: false,
+      qrModalOptions: {
+        explorerRecommendedWalletIds: undefined,
+        explorerExcludedWalletIds: undefined
+      }
+    }),
     injected({ shimDisconnect: true }),
     coinbaseWallet({
       appName: metadata.name,
